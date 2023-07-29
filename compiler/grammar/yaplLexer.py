@@ -289,19 +289,19 @@ class yaplLexer(Lexer):
                   return
               if backslash and char_count < char_limit + 2:
                   self.type = self.ERROR
-                  self.text = "Backslash at end of file"
+                  self.text = "Escaped character at end of file"
                   return
               if sizeerror:
                   self.type = self.ERROR
-                  self.text = "String constant too long"
+                  self.text = "String exceeded max length"
                   return
               if unescaped and char_count < char_limit + 2:
                   self.type = self.ERROR
-                  self.text = "Unterminated string constant"
+                  self.text = "Expected end of string"
                   return
               if eof:
                   self.type = self.ERROR
-                  self.text = "EOF in string constant"
+                  self.text = "EOF in string"
                   return
               if nullflag:
                   self.type = self.ERROR
