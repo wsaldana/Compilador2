@@ -25,7 +25,6 @@ class MyCustomVisitor(yaplVisitor):
         number_value = int(ctx.NUMBER().getText())
         self.symbol_table.add_symbol(id_symbol, number_value)
 
-    # Correct way to access statement rules in program
     def visitProgram(self, ctx: yaplParser.ProgramContext):
         for child in ctx.getChildren():
             print(child)
@@ -37,7 +36,7 @@ class MyCustomVisitor(yaplVisitor):
         return self.symbol_table.get_symbols()
 
 def main():
-    input_stream = FileStream('../examples/recur.cl')  # Replace 'input.txt' with your input file
+    input_stream = FileStream('../examples/recur.cl')
     lexer = yaplLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = yaplParser(stream)
