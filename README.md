@@ -1,6 +1,8 @@
 # Compiler 2
 
-Video testing: https://drive.google.com/file/d/1noVcdKeA1JkZ5xzYrFHc8bpzZnoy_2Vh/view?usp=drive_link
+Video Lab 0: https://drive.google.com/file/d/1noVcdKeA1JkZ5xzYrFHc8bpzZnoy_2Vh/view?usp=drive_link
+
+Video Lab 1: https://drive.google.com/file/d/1OecO-50mQEABWLLk28gItcawmP6V9iD8/view?usp=drive_link
 
 ## Requirements
 Install for python
