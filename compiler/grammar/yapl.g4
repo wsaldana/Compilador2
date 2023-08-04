@@ -46,6 +46,5 @@ expr:
     | ID_VAR
     | INT_VAR
     | STR_VAR
-    | TRUE
-    | FALSE
+    | BOOL_VAR
     | <assoc = right> ID_VAR ASSIGN expr;

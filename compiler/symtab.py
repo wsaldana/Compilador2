@@ -60,7 +60,7 @@ class SymbolsVisitor(yaplVisitor):
     def visitAttr(self, ctx: yaplParser.AttrContext):
         # name = ctx.getToken(44, 0).getText()
         name = ctx.ID_VAR().getText()
-        ttype = ctx.getToken(45, 0).getText()
+        ttype = ctx.getToken(44, 0).getText()
         sym = Symbol(name, ttype)
         parent = ctx.parentCtx
         while isinstance(parent, yaplParser.FeatureDefinitionContext):
@@ -83,7 +83,7 @@ class SymbolsVisitor(yaplVisitor):
     def visitClassDefinition(self, ctx: yaplParser.ClassDefinitionContext):
         temp_scope = SymbolTable()
         self.parent_scopes[id(ctx)] = temp_scope
-        name = ctx.getToken(45, 0).getText()
+        name = ctx.getToken(44, 0).getText()
         ttype = ctx.getToken(1, 0).getText()
         sym = Symbol(name, ttype, temp_scope)
         self.symbol_table.add_symbol(name, sym)
@@ -97,7 +97,7 @@ class SymbolsVisitor(yaplVisitor):
         # Add attributes to the method scope
         for attr in ctx.formal():
             name = attr.ID_VAR().getText()
-            ttype = attr.getToken(45, 0).getText()
+            ttype = attr.getToken(44, 0).getText()
             sym = Symbol(name, ttype)
             temp_scope.add_symbol(name, sym)
 
