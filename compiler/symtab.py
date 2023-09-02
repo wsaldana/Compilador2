@@ -1,4 +1,5 @@
-from antlr4 import FileStream, CommonTokenStream
+import sys
+from antlr4 import InputStream, CommonTokenStream
 from compiler.grammar.yaplLexer import yaplLexer
 from compiler.grammar.yaplParser import yaplParser
 from compiler.grammar.yaplVisitor import yaplVisitor
@@ -123,7 +124,8 @@ class SymbolsVisitor(yaplVisitor):
 
 
 def main():
-    input_stream = FileStream('../examples/recur.cl')
+    file = sys.argv[1]
+    input_stream = InputStream(file)
     lexer = yaplLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = yaplParser(stream)

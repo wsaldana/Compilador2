@@ -1,7 +1,11 @@
 import sys
 import os
+import subprocess
 
-from antlr4 import FileStream, CommonTokenStream
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from antlr4 import InputStream, CommonTokenStream
 
 from compiler.grammar.yaplLexer import yaplLexer
 from compiler.grammar.yaplParser import yaplParser
@@ -11,7 +15,7 @@ from compiler.utils.errors.Errors import ErrorListener
 def main():
     try:
         file = sys.argv[1]
-        input_stream = FileStream(file)
+        input_stream = InputStream(file)
     except Exception as e:
         raise Exception("Error with the file", e)
 
@@ -48,3 +52,33 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+app = FastAPI()
+
+# CORS configuration
+origins = ["http://localhost:3000"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class ScriptRequest(BaseModel):
+    script_code: str
+
+@app.post("/run-python-script")
+async def run_python_script(script_request: ScriptRequest):
+    script_code = script_request.script_code
+    try:
+        # output = subprocess.check_output(['python', '-c', script_code], stderr=subprocess.STDOUT, text=True)
+        output = subprocess.check_output(['python', 'main.py', script_code], stderr=subprocess.STDOUT, text=True)
+        symtab = subprocess.check_output(['python', 'compiler/symtab.py', script_code], stderr=subprocess.STDOUT, text=True)
+        typing = subprocess.check_output(['python', 'compiler/typing.py', script_code], stderr=subprocess.STDOUT, text=True)
+        return {"output": output, "symtab": symtab, "typing": typing}
+    except subprocess.CalledProcessError as e:
+        return {"error": e.output}
+
