@@ -42,3 +42,58 @@ uvicorn main:app --reload
 cd front
 yarn start
 ```
+
+# Codigo intermedio
+#### Asignación
+t1 = a
+
+#### Operaciones aritméticas
+##### Suma
+t1 = a
+t2 = b
+t3 = t1 + t2
+##### Resta
+t1 = a
+t2 = b
+t3 = t1 - t2
+##### Multiplicación
+t1 = a
+t2 = b
+t3 = t1 * t2
+##### División
+t1 = a
+t2 = b
+t3 = t1 / t2
+
+#### Operaciones booleanas
+##### Mayor que
+t1 = a
+t2 = b
+t3 = t1 > t2
+##### Menor que
+t1 = a
+t2 = b
+t3 = t1 < t2
+##### Igual que
+t1 = a
+t2 = b
+t3 = t1 == t2
+##### No igual
+t1 = a
+t2 = b
+t3 = t1 != t2
+
+#### Condicionales
+if a > b goto L1
+t1 = "a no es mayor que b"
+goto L2
+L1: t1 = "a es mayor que b"
+L2:
+
+#### Funciones
+t1 = call FUNC, a, b, ...  # Llama a la función suma con los argumentos a y b
+
+#### Clases
+t1 = new CLASS  # Crea una instancia de la clase CLASS
+t2 = call t1.obtener_valor  # Llama al método obtener_valor de la instancia
+
