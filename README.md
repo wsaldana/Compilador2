@@ -30,5 +30,15 @@ antlr4 -Dlanguage=Python3 yapl.g4 -visitor
 ```
 pipenv shell
 pipenv install
-python main.py <input file>
+```
+
+### Start backend
+```
+uvicorn main:app --reload
+```
+
+### Start front
+```
+cd front
+yarn start
 ```

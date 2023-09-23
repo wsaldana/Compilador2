@@ -4,7 +4,6 @@ from compiler.grammar.yaplLexer import yaplLexer
 from compiler.grammar.yaplParser import yaplParser
 from compiler.grammar.yaplVisitor import yaplVisitor
 from dataclasses import dataclass
-from antlr4.tree.Tree import TerminalNodeImpl
 
 
 class SymbolTable:
@@ -49,6 +48,7 @@ class MethodTyping:
 class Symbol:
     name: str
     type: str or MethodTyping
+    size: int = 0
     refs: SymbolTable = None
 
 
@@ -57,18 +57,38 @@ class SymbolsVisitor(yaplVisitor):
         self.symbol_table = SymbolTable()
         self.current_scope = self.symbol_table
         self.parent_scopes = {}
+        self.sizes = {
+            "Int": 4, # bytes
+            "String": 20, # 2 bytes per char for a max of 10 chars
+            "Bool": 1,
+        }
+
+    def calc_size(self, ttype: str, name: str = '') -> int:
+        size = 0
+        try:
+            size = self.sizes[ttype]
+        except KeyError:
+            print(ttype)
+            if ttype == 'func':
+                ...
+            elif ttype == 'cls':
+                ...
+        return size
 
     def visitAttr(self, ctx: yaplParser.AttrContext):
         # name = ctx.getToken(44, 0).getText()
         name = ctx.ID_VAR().getText()
         ttype = ctx.getToken(44, 0).getText()
-        sym = Symbol(name, ttype)
+        size = self.calc_size(ttype)
+        sym = Symbol(name, ttype, size)
         parent = ctx.parentCtx
         while isinstance(parent, yaplParser.FeatureDefinitionContext):
             parent = parent.parentCtx
         while isinstance(parent, yaplParser.ExprContext):
             parent = parent.parentCtx
-        self.parent_scopes[id(parent)].add_symbol(name, sym)
+        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
+        self.parent_scopes[id(parent)].size += size
+
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
         if ctx.getToken(2, 0):
@@ -83,23 +103,29 @@ class SymbolsVisitor(yaplVisitor):
 
     def visitClassDefinition(self, ctx: yaplParser.ClassDefinitionContext):
         temp_scope = SymbolTable()
-        self.parent_scopes[id(ctx)] = temp_scope
+        # self.parent_scopes[id(ctx)] = temp_scope
         name = ctx.getToken(44, 0).getText()
         ttype = ctx.getToken(1, 0).getText()
-        sym = Symbol(name, ttype, temp_scope)
+        self.sizes[name] = 0
+        sym = Symbol(name, ttype, 0, temp_scope)
+        self.parent_scopes[id(ctx)] = sym
         self.symbol_table.add_symbol(name, sym)
         return self.visitChildren(ctx)
 
     def visitMethodDef(self, ctx: yaplParser.MethodDefContext):
         # Create a scope for this method
         temp_scope = SymbolTable()
-        self.parent_scopes[id(ctx)] = temp_scope
+        #self.parent_scopes[id(ctx)] = temp_scope
+
+        size = 0
 
         # Add attributes to the method scope
         for attr in ctx.formal():
             name = attr.ID_VAR().getText()
             ttype = attr.getToken(44, 0).getText()
-            sym = Symbol(name, ttype)
+            size_attr = self.calc_size(ttype)
+            size += size_attr
+            sym = Symbol(name, ttype, size_attr)
             temp_scope.add_symbol(name, sym)
 
         # Create a symbol from this method
@@ -107,14 +133,16 @@ class SymbolsVisitor(yaplVisitor):
         formals = tuple([f.TYPE_IDENTIFIER().getText() for f in ctx.formal()])
         ttype = ctx.TYPE_IDENTIFIER().getText()
         tab_type = MethodTyping(formals, ttype)
-        sym = Symbol(name, tab_type, temp_scope)
+        sym = Symbol(name, tab_type, size, temp_scope)
+        self.parent_scopes[id(ctx)] = sym
 
         # Add this symbol to its parent scope
         parent = ctx.parentCtx
         # Parent may not be in scope, as if it is a feature
         while isinstance(parent, yaplParser.FeatureDefinitionContext):
             parent = parent.parentCtx
-        self.parent_scopes[id(parent)].add_symbol(name, sym)
+        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
+        self.parent_scopes[id(parent)].size += self.parent_scopes[id(ctx)].size
 
         # Visit its children
         return self.visitChildren(ctx)
