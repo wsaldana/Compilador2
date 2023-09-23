@@ -87,8 +87,10 @@ class SymbolsVisitor(yaplVisitor):
         while isinstance(parent, yaplParser.ExprContext):
             parent = parent.parentCtx
         self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
-        self.parent_scopes[id(parent)].size += size
-
+        while parent:
+            if id(parent) in self.parent_scopes.keys():
+                self.parent_scopes[id(parent)].size += size
+            parent = parent.parentCtx
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
         if ctx.getToken(2, 0):
@@ -107,7 +109,7 @@ class SymbolsVisitor(yaplVisitor):
         name = ctx.getToken(44, 0).getText()
         ttype = ctx.getToken(1, 0).getText()
         self.sizes[name] = 0
-        sym = Symbol(name, ttype, 0, temp_scope)
+        sym = Symbol(name, ttype, 4, temp_scope)
         self.parent_scopes[id(ctx)] = sym
         self.symbol_table.add_symbol(name, sym)
         return self.visitChildren(ctx)
@@ -117,7 +119,7 @@ class SymbolsVisitor(yaplVisitor):
         temp_scope = SymbolTable()
         #self.parent_scopes[id(ctx)] = temp_scope
 
-        size = 0
+        size = 4 # func definition size
 
         # Add attributes to the method scope
         for attr in ctx.formal():
