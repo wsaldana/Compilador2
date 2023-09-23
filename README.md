@@ -84,14 +84,27 @@ t2 = b
 t3 = t1 != t2
 
 #### Condicionales
-if a > b goto L1
-t1 = "a no es mayor que b"
+t2 = a
+t3 = b
+if t2 [bool_op] t3 goto L1
+t1 = ...
 goto L2
-L1: t1 = "a es mayor que b"
+L1: t1 = ...
 L2:
 
 #### Funciones
-t1 = call FUNC, a, b, ...  # Llama a la función suma con los argumentos a y b
+```
+L1: 
+    FUNC t2, t3, ...:
+        [func def]
+        t1 = ...
+        goto L2
+L2:
+    t1 = call FUNC a, b, ...
+        t2 = a
+        t3 = b
+        goto L1
+```
 
 #### Clases
 t1 = new CLASS  # Crea una instancia de la clase CLASS
