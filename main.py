@@ -78,7 +78,8 @@ async def run_python_script(script_request: ScriptRequest):
         output = subprocess.check_output(['python', 'main.py', script_code], stderr=subprocess.STDOUT, text=True)
         symtab = subprocess.check_output(['python', 'compiler/symtab.py', script_code], stderr=subprocess.STDOUT, text=True)
         typing = subprocess.check_output(['python', 'compiler/typing.py', script_code], stderr=subprocess.STDOUT, text=True)
-        return {"output": output, "symtab": symtab, "typing": typing}
+        tac = subprocess.check_output(['python', 'compiler/tac.py', script_code], stderr=subprocess.STDOUT, text=True)
+        return {"output": output, "symtab": symtab, "typing": typing, "tac": tac}
     except subprocess.CalledProcessError as e:
         return {"error": e.output}
 

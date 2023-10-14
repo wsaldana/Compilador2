@@ -8,6 +8,7 @@ function App() {
   const [output, setOutput] = useState('');
   const [symtab, setSymtab] = useState('');
   const [typing, setTyping] = useState('');
+  const [tac, setTac] = useState('');
   const [scriptCode, setScriptCode] = useState('');
 
   const runPythonScript = async () => {
@@ -27,12 +28,14 @@ function App() {
           setOutput(data.error);
           setSymtab('')
           setTyping('')
+          setTac('')
         } else {
           setErr(false)
           console.log(data)
           setOutput(data.output);
           setSymtab(data.symtab)
           setTyping(data.typing)
+          setTac(data.tac)
         }
       } else {
         console.error('Error running the Python script.');
@@ -81,6 +84,12 @@ function App() {
             <div className="gjs-cell" id="iqlk">
               <div id="i4fwu" style={typing ? {color: 'red'} : {color: 'lime'}}>
                 {typing ? typing : "No typing errors"}<br />
+              </div>
+            </div>
+            <br></br>
+            <div className="gjs-cell" id="iqlk">
+              <div id="i4fwu" style={typing ? {color: 'red'} : {color: 'lime'}}>
+                {tac ? tac : "TAC:"}<br />
               </div>
             </div>
           </div>
