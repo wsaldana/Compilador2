@@ -56,11 +56,12 @@ class Symbol:
 
     def __repr__(self) -> str:
         if self.type == "class":
-            return f'{self.name}:'
+            return f'CLASS {self.name}:'
         elif isinstance(self.type, MethodTyping):
             return f'FUNC {self.parent_name}.{self.name}:'
         elif self.type in ("Int", "Bool", "String"):
-            return f'{self.name}'
+            prefix = f'{self.parent_name}.' if self.parent_name else ''
+            return f'{prefix}{self.name}'
         else:
             return f'Symbol({self.name}, {self.type}, {self.parent_name})'
 
@@ -116,6 +117,8 @@ class SymbolsVisitor(yaplVisitor):
             if id(parent) in self.parent_scopes.keys():
                 self.parent_scopes[id(parent)].size += size
             parent = parent.parentCtx
+        if parent:
+            sym.parent_name = parent.getToken(44, 0).getText()
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
         if ctx.getToken(2, 0):
@@ -151,6 +154,7 @@ class SymbolsVisitor(yaplVisitor):
                 self.visitClassDefinition(child)
 
     def visitClassDefinition(self, ctx: yaplParser.ClassDefinitionContext):
+        self.t_count = 0
         temp_scope = SymbolTable()
         # self.parent_scopes[id(ctx)] = temp_scope
         name = ctx.getToken(44, 0).getText()
