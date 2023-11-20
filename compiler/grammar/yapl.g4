@@ -23,10 +23,7 @@ attributeDefinition:
     <assoc = right> ID_VAR COLON TYPE_IDENTIFIER (ASSIGN expr)? # attr;
 
 expr:
-    expr MULT expr                                        #arith_mult
-    | expr DIV expr                                       #arith_div
-    | expr PLUS expr                                      #arith_sum
-    | expr MINUS expr                                     #arith_res
+    expr (MULT | DIV | PLUS | MINUS) expr                 #arith
     | expr LESS_EQUAL expr                                #bool_le
     | expr LESS_THAN expr                                 #bool_lt
     | expr EQUAL expr                                     #equal

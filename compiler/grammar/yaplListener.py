@@ -71,30 +71,21 @@ class yaplListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by yaplParser#arith.
+    def enterArith(self, ctx:yaplParser.ArithContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#arith.
+    def exitArith(self, ctx:yaplParser.ArithContext):
+        pass
+
+
     # Enter a parse tree produced by yaplParser#new_type.
     def enterNew_type(self, ctx:yaplParser.New_typeContext):
         pass
 
     # Exit a parse tree produced by yaplParser#new_type.
     def exitNew_type(self, ctx:yaplParser.New_typeContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#arith_mult.
-    def enterArith_mult(self, ctx:yaplParser.Arith_multContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#arith_mult.
-    def exitArith_mult(self, ctx:yaplParser.Arith_multContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#arith_sum.
-    def enterArith_sum(self, ctx:yaplParser.Arith_sumContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#arith_sum.
-    def exitArith_sum(self, ctx:yaplParser.Arith_sumContext):
         pass
 
 
@@ -122,15 +113,6 @@ class yaplListener(ParseTreeListener):
 
     # Exit a parse tree produced by yaplParser#negative_expr.
     def exitNegative_expr(self, ctx:yaplParser.Negative_exprContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#arith_div.
-    def enterArith_div(self, ctx:yaplParser.Arith_divContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#arith_div.
-    def exitArith_div(self, ctx:yaplParser.Arith_divContext):
         pass
 
 
@@ -230,15 +212,6 @@ class yaplListener(ParseTreeListener):
 
     # Exit a parse tree produced by yaplParser#bool_le.
     def exitBool_le(self, ctx:yaplParser.Bool_leContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#arith_res.
-    def enterArith_res(self, ctx:yaplParser.Arith_resContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#arith_res.
-    def exitArith_res(self, ctx:yaplParser.Arith_resContext):
         pass
 
 

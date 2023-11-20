@@ -44,18 +44,13 @@ class yaplVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by yaplParser#arith.
+    def visitArith(self, ctx:yaplParser.ArithContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by yaplParser#new_type.
     def visitNew_type(self, ctx:yaplParser.New_typeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#arith_mult.
-    def visitArith_mult(self, ctx:yaplParser.Arith_multContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#arith_sum.
-    def visitArith_sum(self, ctx:yaplParser.Arith_sumContext):
         return self.visitChildren(ctx)
 
 
@@ -71,11 +66,6 @@ class yaplVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by yaplParser#negative_expr.
     def visitNegative_expr(self, ctx:yaplParser.Negative_exprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#arith_div.
-    def visitArith_div(self, ctx:yaplParser.Arith_divContext):
         return self.visitChildren(ctx)
 
 
@@ -131,11 +121,6 @@ class yaplVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by yaplParser#bool_le.
     def visitBool_le(self, ctx:yaplParser.Bool_leContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#arith_res.
-    def visitArith_res(self, ctx:yaplParser.Arith_resContext):
         return self.visitChildren(ctx)
 
 
