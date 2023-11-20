@@ -24,17 +24,13 @@ attributeDefinition:
 
 expr:
     expr (MULT | DIV | PLUS | MINUS) expr                 #arith
-    | expr LESS_EQUAL expr                                #bool_le
-    | expr LESS_THAN expr                                 #bool_lt
-    | expr EQUAL expr                                     #equal
+    | expr (LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL | EQUAL) expr               #bool
     | NEW TYPE_IDENTIFIER                                 #new_type
     | NEGATIVE expr                                       #negative_expr
     | ISVOID expr                                         #void_expr
     | NOT expr                                            #not_expr
     | ID_VAR                                              #id_var
-    | INT_VAR                                             #int_var
-    | STR_VAR                                             #str_var
-    | BOOL_VAR                                            #bool_var
+    | (INT_VAR | STR_VAR | BOOL_VAR)                      #simple_var
     | <assoc = right> ID_VAR ASSIGN expr                  #asign_expr
     | ID_VAR LPAREN (expr (COMMA expr)*)* RPAREN          #params
     | IF expr THEN expr ELSE expr FI                      #statement_if

@@ -1,98 +1,9 @@
 import sys
-from typing import List
 from typing_extensions import SupportsIndex
 from antlr4 import InputStream, CommonTokenStream
 from compiler.grammar.yaplLexer import yaplLexer
 from compiler.grammar.yaplParser import yaplParser
 from compiler.grammar.yaplVisitor import yaplVisitor
-from dataclasses import dataclass
-
-
-class SymbolTable:
-    def __init__(self):
-        self.symbols = {}
-        self._l = 0
-    
-    def get_l(self):
-        self._l += 1
-        return f"L{self._l}"
-
-    def add_symbol(self, name, value):
-        self.symbols[name] = value
-
-    def get_symbols(self):
-        return self.symbols
-
-    def items(self):
-        return self.symbols.items()
-
-    def to_string(self, table=None, tabs="", label=False):
-        table = self if table is None else table
-        string = ''
-        for k, v in table.items():
-            plus_tabs = ""
-            if type(v.type) == str and v.type not in ("LET") or type(v.type) == MethodTyping:
-                labeled = False
-                for splitted in str(v).split("~"):
-                    l_prefix = f"{self.get_l()}: " if label and not labeled else ""
-                    labeled = True if l_prefix else False
-                    string += tabs + l_prefix + splitted + "\n"
-                    plus_tabs = "\t"
-            if v.refs:
-                if v.type == str(yaplParser.Statement_ifContext):
-                    string += self.to_string(v.refs, tabs + plus_tabs, label=True)
-                else:
-                    string += self.to_string(v.refs, tabs + plus_tabs)
-        return string
-
-    def __repr__(self) -> str:
-        return f"SymbolTable{tuple(self.symbols.keys())}"
-
-    def __str__(self) -> str:
-        return self.__repr__()
-
-
-@dataclass
-class MethodTyping:
-    attrs: tuple
-    rtrn: str
-
-    def __repr__(self) -> str:
-        return f"{self.attrs} -> {self.rtrn}"
-
-
-@dataclass
-class Symbol:
-    name: str
-    type: str or MethodTyping
-    size: int = 0
-    refs: SymbolTable = None
-    parent_name: str = ""
-    ctx: object = None
-
-    def __repr__(self) -> str:
-        if self.type == "class":
-            return f'CLASS {self.name}:'
-        elif isinstance(self.type, MethodTyping):
-            return f'FUNC {self.parent_name}.{self.name}:'
-        elif self.type in ("Int", "Bool", "String"):
-            prefix = f'{self.parent_name}.' if self.parent_name else ''
-            return f'{prefix}{self.name}'
-        elif self.type == "block":
-            return f'{self.name}:\n\t{self.ctx.children[3].getText()}'
-        elif self.type == str(yaplParser.Asign_exprContext):
-            if type(self.ctx) == str:
-                return f'{self.name} = {self.ctx}'
-            return f'{self.name} = {self.ctx.expr().getText()}'
-        elif self.type == str(yaplParser.Statement_ifContext):
-            list(self.refs.symbols.values())[0]
-            return f"if something goto L1~goto L2"
-        elif self.type == "LABEL":
-            return f"{self.name}:"
-        elif self.type == "OBJ":
-            return f"{self.name} = NEW {str(self.ctx.TYPE_IDENTIFIER())}"
-        else:
-            return f'Symbol({self.name}, {self.type}, {self.parent_name})'
 
 
 class Stack(list):
@@ -102,18 +13,10 @@ class Stack(list):
 
 class SymbolsVisitor(yaplVisitor):
     def __init__(self):
-        self.symbol_table = SymbolTable()
-        self.current_scope = self.symbol_table
-        self.parent_scopes = {}
-        self.sizes = {
-            "Int": 4, # bytes
-            "String": 20, # 2 bytes per char for a max of 10 chars
-            "Bool": 1,
-        }
         self.t_count = 0
         self.l_count = 0
         self.var_stack = Stack()
-        self.temps = []
+        self.args = []
 
     def get_t(self, current=False):
         if not current:
@@ -124,114 +27,145 @@ class SymbolsVisitor(yaplVisitor):
         self.l_count += 1
         return f'L{self.l_count}'
 
-    def calc_size(self, ttype: str, name: str = '') -> int:
-        size = 0
-        try:
-            size = self.sizes[ttype]
-        except KeyError:
-            print(ttype)
-            if ttype == 'func':
-                ...
-            elif ttype == 'cls':
-                ...
-        return size
+    def visitSimple_var(self, ctx: yaplParser.Simple_varContext):
+        val = ctx.getText()
+        self.var_stack.append(val)
+
+    def visitId_var(self, ctx: yaplParser.Id_varContext):
+        parent = ctx.parentCtx
+        if isinstance(
+            parent,
+            (
+                yaplParser.ArithContext,
+                yaplParser.BoolContext,
+                yaplParser.Statement_atContext,
+                yaplParser.ParamsContext
+            )
+        ):
+            name = ctx.getText()
+            self.var_stack.append(name)
+
+    def visitStatement_at(self, ctx: yaplParser.Statement_atContext):
+        args = ctx.expr()
+        if not isinstance(args, list):
+            args = [args]
+        args = args[1:]
+
+        if not isinstance(ctx.parentCtx, (yaplParser.ParamsContext, yaplParser.Statement_atContext)):
+            priv_stack = Stack()
+            original_stack = self.var_stack.copy()
+            self.var_stack = priv_stack
+        else:
+            priv_stack = self.var_stack
+
+        for arg in args:
+            self.visit(arg)
+            print(f"PUSH {priv_stack.pop()}")
+
+        if not isinstance(ctx.parentCtx, (yaplParser.ParamsContext, yaplParser.Statement_atContext)):
+            self.var_stack = Stack()
+            self.var_stack.extend(original_stack)
+
+        res = self.get_t()
+        self.var_stack.append(res)
+        name = ctx.ID_VAR()
+        print(f"{res} = CALL {ctx.expr(0).getText()}.{name}")
+
+    def visitParams(self, ctx: yaplParser.ParamsContext):
+        args = ctx.expr()
+        if not isinstance(args, list):
+            args = [args]
+
+        if not isinstance(ctx.parentCtx, (yaplParser.ParamsContext, yaplParser.Statement_atContext)):
+            priv_stack = Stack()
+            original_stack = self.var_stack.copy()
+            self.var_stack = priv_stack
+        else:
+            priv_stack = self.var_stack
+
+        for arg in args:
+            self.visit(arg)
+            print(f"PUSH {priv_stack.pop()}")
+
+        if not isinstance(ctx.parentCtx, (yaplParser.ParamsContext, yaplParser.Statement_atContext)):
+            self.var_stack = Stack()
+            self.var_stack.extend(original_stack)
+
+
+        res = self.get_t()
+        self.var_stack.append(res)
+        name = ctx.ID_VAR()
+        print(f"{res} = CALL {name}")
+
+    def visitArith(self, ctx: yaplParser.ArithContext):
+        self.visitChildren(ctx)
+        res = self.get_t()
+        self.var_stack.append(res)
+        #print("---- ", ctx.getText(), self.var_stack)
+        left = self.var_stack.pop()
+        right = self.var_stack.pop()
+        op = ctx.children[1].getText()
+        print(f"{res} = {left} {op} {right}")
+
+    def visitBool(self, ctx: yaplParser.BoolContext):
+        self.visitChildren(ctx)
+        res = self.get_t()
+        self.var_stack.append(res)
+        #print("---- ", ctx.getText(), self.var_stack)
+        left = self.var_stack.pop()
+        right = self.var_stack.pop()
+        op = ctx.children[1].getText()
+        op = '==' if op == '=' else op
+        print(f"{res} = {left} {op} {right}")
 
     def visitAttr(self, ctx: yaplParser.AttrContext):
-        value = ctx.expr()
-        if not value:
-            value = "NONE"
+        classname = ctx.parentCtx.parentCtx.TYPE_IDENTIFIER(0).getText()
+        name = ctx.ID_VAR()
+        if ctx.expr():
+            if isinstance(ctx.expr(), yaplParser.Simple_varContext):
+                print(f"{classname}.{name} = {ctx.expr().getText()}")
+            else:
+                self.visitChildren(ctx)
+                print(f"{classname}.{name} = {self.var_stack.pop()}")
         else:
-            value = value.getText()
-        name = f'{ctx.ID_VAR().getText()} = {value}'
-        ttype = ctx.getToken(44, 0).getText()
-        size = self.calc_size(ttype)
-        sym = Symbol(name, ttype, size)
-        parent = ctx.parentCtx
-        while isinstance(parent, yaplParser.FeatureDefinitionContext):
-            parent = parent.parentCtx
-        while isinstance(parent, yaplParser.ExprContext):
-            parent = parent.parentCtx
-        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
-        while parent:
-            if id(parent) in self.parent_scopes.keys():
-                self.parent_scopes[id(parent)].size += size
-            parent = parent.parentCtx
-        if parent:
-            sym.parent_name = parent.getToken(44, 0).getText()
+            print(f"{classname}.{name} = NONE")
 
     def visitStatement_let(self, ctx: yaplParser.Statement_letContext):
-        """ parent = ctx.parentCtx.parentCtx.parentCtx
-        vars: List[yaplParser.VarTypescriptContext] = ctx.varTypescript()
-        for var in vars:
-            name = self.get_t()
-            ttype = var.getToken(44, 0).getText()
-            sym = Symbol(name, ttype)
-            self.var_stack.append(sym)
-            self.parent_scopes[id(parent)].refs.add_symbol(name, sym) """
-        parent = ctx.parentCtx.parentCtx.parentCtx
-        name = ctx.varTypescript(0).ID_VAR().getText()
-        refs = SymbolTable()
-        sym = Symbol(name, "LET", refs=refs)
-        self.parent_scopes[id(ctx)] = sym
-        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
-        return self.visitChildren(ctx)
+        self.visitChildren(ctx)
+        vars = ctx.varTypescript()
+        listed = [c.ID_VAR().getText() for c in vars]
+        joined = ', '.join(listed)
+        print(f"RETURN {joined}")
 
     def visitAsign_expr(self, ctx: yaplParser.Asign_exprContext):
         self.visitChildren(ctx)
-        name = ctx.ID_VAR().getText()
-        ttype = str(type(ctx))
-        if len(self.temps) > 0:
-            sym = Symbol(name, ttype, ctx=self.temps.pop())
-        else:
-            sym = Symbol(name, ttype, ctx=ctx)
-        parent = ctx.parentCtx
-        while isinstance(parent, yaplParser.Statement_braceContext):
-            parent = parent.parentCtx
-        self.parent_scopes[id(parent)].refs.add_symbol(id(ctx), sym)
-        return
+        name = ctx.ID_VAR()
+        value = self.var_stack.pop()
+        print(f"{name} = {value}")
 
     def visitNew_type(self, ctx: yaplParser.New_typeContext):
-        temp = self.get_t()
-        self.temps.append(temp)
-        sym = Symbol(temp, "OBJ", ctx=ctx)
-        parent = ctx.parentCtx.parentCtx.parentCtx
-        self.parent_scopes[id(parent)].refs.add_symbol(id(ctx), sym)
-        return self.visitChildren(ctx)
+        obj = self.get_t()
+        self.var_stack.append(obj)
+        print(f"{obj} = NEW {ctx.TYPE_IDENTIFIER()}")
 
     def visitStatement_if(self, ctx: yaplParser.Statement_ifContext):
-        parent = ctx.parentCtx
-        refs = SymbolTable()
-        sym = Symbol(str(id(ctx)), str(type(ctx)), ctx=ctx, refs=refs)
-        self.parent_scopes[id(ctx)] = sym
-        self.parent_scopes[id(parent)].refs.add_symbol(str(id(ctx)), sym)
-        return self.visitChildren(ctx)
+        label1 = self.get_l()
+        label2 = self.get_l()
+        label3 = self.get_l()
+        self.visitBool(ctx.children[1])
+        condition = self.var_stack.pop()
+        print(f"if {condition} goto {label1}")
+        print(f"goto {label2}")
+        print(f"{label1}:")
+        #self.visitExpr(ctx.children[3])
+        self.visit(ctx.children[3])
+        print(f"goto {label3}")
+        print(f"{label2}:")
+        #self.visitExpr(ctx.children[5])
+        self.visit(ctx.children[5])
+        print(f"{label3}:")
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
-        if ctx.getToken(2, 0):
-            var = ctx.varTypescript()[0]
-            self.visitAttr(var)
-
-        else:
-            name = ctx.getText()
-            try:
-                left_operand = ctx.getChild(0)
-                right_operand = ctx.getChild(2)
-                operator = ctx.getChild(1).getText()
-                result_variable = self.get_t() 
-                name = f"{result_variable} = {left_operand} {operator} {right_operand}"
-            except:
-                pass
-            sym = Symbol(name, "exp")
-
-            parent = ctx.parentCtx
-            while isinstance(parent, yaplParser.MethodDefContext):
-                parent = parent.parentCtx
-            while isinstance(parent, yaplParser.FeatureDefinitionContext):
-                parent = parent.parentCtx
-            while isinstance(parent, yaplParser.ExprContext):
-                parent = parent.parentCtx
-            self.parent_scopes[id(parent)].refs.add_symbol("EXP", sym)
-
         return self.visitChildren(ctx)
 
     def visitProgram(self, ctx: yaplParser.ProgramContext):
@@ -240,54 +174,32 @@ class SymbolsVisitor(yaplVisitor):
                 self.visitClassDefinition(child)
 
     def visitClassDefinition(self, ctx: yaplParser.ClassDefinitionContext):
-        self.t_count = 0
-        temp_scope = SymbolTable()
-        # self.parent_scopes[id(ctx)] = temp_scope
-        name = ctx.getToken(44, 0).getText()
-        ttype = ctx.getToken(1, 0).getText()
-        self.sizes[name] = 0
-        sym = Symbol(name, ttype, 4, temp_scope)
-        self.parent_scopes[id(ctx)] = sym
-        self.symbol_table.add_symbol(name, sym)
-        return self.visitChildren(ctx)
+        print('CLASS ', ctx.TYPE_IDENTIFIER(0).getText())
+        self.visitChildren(ctx)
 
     def visitMethodDef(self, ctx: yaplParser.MethodDefContext):
-        # Create a scope for this method
-        temp_scope = SymbolTable()
-        #self.parent_scopes[id(ctx)] = temp_scope
-
-        size = 4 # func definition size
-
-        # Add attributes to the method scope
-        for attr in ctx.formal():
-            name = f'{attr.ID_VAR().getText()} = {self.get_t()}'
-            ttype = attr.getToken(44, 0).getText()
-            size_attr = self.calc_size(ttype)
-            size += size_attr
-            sym = Symbol(name, ttype, size_attr)
-            temp_scope.add_symbol(name, sym)
-
-        # Create a symbol from this method
-        name = ctx.ID_VAR().getText()
-        formals = tuple([f.TYPE_IDENTIFIER().getText() for f in ctx.formal()])
-        ttype = ctx.TYPE_IDENTIFIER().getText()
-        tab_type = MethodTyping(formals, ttype)
-        sym = Symbol(name, tab_type, size, temp_scope)
-        self.parent_scopes[id(ctx)] = sym
-
-        # Add this symbol to its parent scope
-        parent = ctx.parentCtx
-        # Parent may not be in scope, as if it is a feature
-        while isinstance(parent, yaplParser.FeatureDefinitionContext):
-            parent = parent.parentCtx
-        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
-        self.parent_scopes[id(parent)].size += self.parent_scopes[id(ctx)].size
-        sym.parent_name = parent.getToken(44, 0).getText()
-        # Visit its children
-        return self.visitChildren(ctx)
+        self.l_count = 0
+        self.t_count = 0
+        classname = ctx.parentCtx.parentCtx.TYPE_IDENTIFIER(0).getText()
+        name = ctx.ID_VAR()
+        print(f'FUNC {classname}.{name}')
+        self.visitChildren(ctx)
+        print("END_FUNC\n")
 
     def get_symbol_table(self):
         return self.symbol_table
+
+
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+
+    def flush(self):
+        pass
 
 
 def main():
@@ -297,12 +209,15 @@ def main():
     stream = CommonTokenStream(lexer)
     parser = yaplParser(stream)
 
+    f = open('logfile', 'w')
+    backup = sys.stdout
+    sys.stdout = Tee(sys.stdout, f)
+
     tree = parser.program()
     visitor = SymbolsVisitor()
     visitor.visit(tree)
 
-    symbol_table = visitor.get_symbol_table()
-    print(symbol_table.to_string())
+    sys.stdout = backup
 
 
 if __name__ == '__main__':

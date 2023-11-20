@@ -116,12 +116,12 @@ class yaplListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by yaplParser#int_var.
-    def enterInt_var(self, ctx:yaplParser.Int_varContext):
+    # Enter a parse tree produced by yaplParser#bool.
+    def enterBool(self, ctx:yaplParser.BoolContext):
         pass
 
-    # Exit a parse tree produced by yaplParser#int_var.
-    def exitInt_var(self, ctx:yaplParser.Int_varContext):
+    # Exit a parse tree produced by yaplParser#bool.
+    def exitBool(self, ctx:yaplParser.BoolContext):
         pass
 
 
@@ -131,15 +131,6 @@ class yaplListener(ParseTreeListener):
 
     # Exit a parse tree produced by yaplParser#statement_paren.
     def exitStatement_paren(self, ctx:yaplParser.Statement_parenContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#bool_lt.
-    def enterBool_lt(self, ctx:yaplParser.Bool_ltContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#bool_lt.
-    def exitBool_lt(self, ctx:yaplParser.Bool_ltContext):
         pass
 
 
@@ -161,12 +152,12 @@ class yaplListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by yaplParser#str_var.
-    def enterStr_var(self, ctx:yaplParser.Str_varContext):
+    # Enter a parse tree produced by yaplParser#simple_var.
+    def enterSimple_var(self, ctx:yaplParser.Simple_varContext):
         pass
 
-    # Exit a parse tree produced by yaplParser#str_var.
-    def exitStr_var(self, ctx:yaplParser.Str_varContext):
+    # Exit a parse tree produced by yaplParser#simple_var.
+    def exitSimple_var(self, ctx:yaplParser.Simple_varContext):
         pass
 
 
@@ -197,24 +188,6 @@ class yaplListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by yaplParser#equal.
-    def enterEqual(self, ctx:yaplParser.EqualContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#equal.
-    def exitEqual(self, ctx:yaplParser.EqualContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#bool_le.
-    def enterBool_le(self, ctx:yaplParser.Bool_leContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#bool_le.
-    def exitBool_le(self, ctx:yaplParser.Bool_leContext):
-        pass
-
-
     # Enter a parse tree produced by yaplParser#asign_expr.
     def enterAsign_expr(self, ctx:yaplParser.Asign_exprContext):
         pass
@@ -230,15 +203,6 @@ class yaplListener(ParseTreeListener):
 
     # Exit a parse tree produced by yaplParser#id_var.
     def exitId_var(self, ctx:yaplParser.Id_varContext):
-        pass
-
-
-    # Enter a parse tree produced by yaplParser#bool_var.
-    def enterBool_var(self, ctx:yaplParser.Bool_varContext):
-        pass
-
-    # Exit a parse tree produced by yaplParser#bool_var.
-    def exitBool_var(self, ctx:yaplParser.Bool_varContext):
         pass
 
 

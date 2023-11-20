@@ -69,18 +69,13 @@ class yaplVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by yaplParser#int_var.
-    def visitInt_var(self, ctx:yaplParser.Int_varContext):
+    # Visit a parse tree produced by yaplParser#bool.
+    def visitBool(self, ctx:yaplParser.BoolContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by yaplParser#statement_paren.
     def visitStatement_paren(self, ctx:yaplParser.Statement_parenContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#bool_lt.
-    def visitBool_lt(self, ctx:yaplParser.Bool_ltContext):
         return self.visitChildren(ctx)
 
 
@@ -94,8 +89,8 @@ class yaplVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by yaplParser#str_var.
-    def visitStr_var(self, ctx:yaplParser.Str_varContext):
+    # Visit a parse tree produced by yaplParser#simple_var.
+    def visitSimple_var(self, ctx:yaplParser.Simple_varContext):
         return self.visitChildren(ctx)
 
 
@@ -114,16 +109,6 @@ class yaplVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by yaplParser#equal.
-    def visitEqual(self, ctx:yaplParser.EqualContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#bool_le.
-    def visitBool_le(self, ctx:yaplParser.Bool_leContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by yaplParser#asign_expr.
     def visitAsign_expr(self, ctx:yaplParser.Asign_exprContext):
         return self.visitChildren(ctx)
@@ -131,11 +116,6 @@ class yaplVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by yaplParser#id_var.
     def visitId_var(self, ctx:yaplParser.Id_varContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by yaplParser#bool_var.
-    def visitBool_var(self, ctx:yaplParser.Bool_varContext):
         return self.visitChildren(ctx)
 
 

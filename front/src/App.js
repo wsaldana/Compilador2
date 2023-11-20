@@ -88,7 +88,7 @@ function App() {
             </div>
             <br></br>
             <div className="gjs-cell" id="iqlk">
-              <div id="i4fwu" style={typing ? {color: 'red'} : {color: 'lime'}}>
+              <div id="i4fwu1" style={typing ? {color: 'red'} : {color: 'lime'}}>
                 {tac ? tac : "TAC:"}<br />
               </div>
             </div>
