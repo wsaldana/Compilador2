@@ -23,28 +23,28 @@ attributeDefinition:
     <assoc = right> ID_VAR COLON TYPE_IDENTIFIER (ASSIGN expr)? # attr;
 
 expr:
-    ID_VAR LPAREN (expr (COMMA expr)*)* RPAREN
+    expr MULT expr                                        #arith_mult
+    | expr DIV expr                                       #arith_div
+    | expr PLUS expr                                      #arith_sum
+    | expr MINUS expr                                     #arith_res
+    | expr LESS_EQUAL expr                                #bool_le
+    | expr LESS_THAN expr                                 #bool_lt
+    | expr EQUAL expr                                     #equal
+    | NEW TYPE_IDENTIFIER                                 #new_type
+    | NEGATIVE expr                                       #negative_expr
+    | ISVOID expr                                         #void_expr
+    | NOT expr                                            #not_expr
+    | ID_VAR                                              #id_var
+    | INT_VAR                                             #int_var
+    | STR_VAR                                             #str_var
+    | BOOL_VAR                                            #bool_var
+    | <assoc = right> ID_VAR ASSIGN expr                  #asign_expr
+    | ID_VAR LPAREN (expr (COMMA expr)*)* RPAREN          #params
+    | IF expr THEN expr ELSE expr FI                      #statement_if
+    | WHILE expr LOOP expr POOL                           #statement_while
+    | LBRACE (expr SEMICOLON)+ RBRACE                     #statement_brace
+    | LET varTypescript (COMMA varTypescript)* IN expr    #statement_let
+    | LPAREN expr RPAREN                                  #statement_paren
 	| expr (AT TYPE_IDENTIFIER)? PERIOD ID_VAR LPAREN (
 		expr (COMMA expr)*
-	)* RPAREN	
-    | IF expr THEN expr ELSE expr FI
-    | WHILE expr LOOP expr POOL
-    | LBRACE (expr SEMICOLON)+ RBRACE
-    | LET varTypescript (COMMA varTypescript)* IN expr
-    | NEW TYPE_IDENTIFIER
-    | NEGATIVE expr
-    | ISVOID expr
-    | expr MULT expr
-    | expr DIV expr
-    | expr PLUS expr
-    | expr MINUS expr
-    | expr LESS_EQUAL expr
-    | expr LESS_THAN expr
-    | expr EQUAL expr
-    | NOT expr
-    | LPAREN expr RPAREN
-    | ID_VAR
-    | INT_VAR
-    | STR_VAR
-    | BOOL_VAR
-    | <assoc = right> ID_VAR ASSIGN expr;
+	)* RPAREN                                             #statement_at;

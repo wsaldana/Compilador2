@@ -1,15 +1,21 @@
 import sys
+from typing import List
+from typing_extensions import SupportsIndex
 from antlr4 import InputStream, CommonTokenStream
 from compiler.grammar.yaplLexer import yaplLexer
 from compiler.grammar.yaplParser import yaplParser
 from compiler.grammar.yaplVisitor import yaplVisitor
 from dataclasses import dataclass
-from antlr4.tree.Tree import TerminalNodeImpl
 
 
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
+        self._l = 0
+    
+    def get_l(self):
+        self._l += 1
+        return f"L{self._l}"
 
     def add_symbol(self, name, value):
         self.symbols[name] = value
@@ -20,13 +26,23 @@ class SymbolTable:
     def items(self):
         return self.symbols.items()
 
-    def to_string(self, table=None, tabs=""):
+    def to_string(self, table=None, tabs="", label=False):
         table = self if table is None else table
         string = ''
         for k, v in table.items():
-            string += tabs + str(v) + "\n"
+            plus_tabs = ""
+            if type(v.type) == str and v.type not in ("LET") or type(v.type) == MethodTyping:
+                labeled = False
+                for splitted in str(v).split("~"):
+                    l_prefix = f"{self.get_l()}: " if label and not labeled else ""
+                    labeled = True if l_prefix else False
+                    string += tabs + l_prefix + splitted + "\n"
+                    plus_tabs = "\t"
             if v.refs:
-                string += self.to_string(v.refs, tabs + "\t")
+                if v.type == str(yaplParser.Statement_ifContext):
+                    string += self.to_string(v.refs, tabs + plus_tabs, label=True)
+                else:
+                    string += self.to_string(v.refs, tabs + plus_tabs)
         return string
 
     def __repr__(self) -> str:
@@ -62,8 +78,26 @@ class Symbol:
         elif self.type in ("Int", "Bool", "String"):
             prefix = f'{self.parent_name}.' if self.parent_name else ''
             return f'{prefix}{self.name}'
+        elif self.type == "block":
+            return f'{self.name}:\n\t{self.ctx.children[3].getText()}'
+        elif self.type == str(yaplParser.Asign_exprContext):
+            if type(self.ctx) == str:
+                return f'{self.name} = {self.ctx}'
+            return f'{self.name} = {self.ctx.expr().getText()}'
+        elif self.type == str(yaplParser.Statement_ifContext):
+            list(self.refs.symbols.values())[0]
+            return f"if something goto L1~goto L2"
+        elif self.type == "LABEL":
+            return f"{self.name}:"
+        elif self.type == "OBJ":
+            return f"{self.name} = NEW {str(self.ctx.TYPE_IDENTIFIER())}"
         else:
             return f'Symbol({self.name}, {self.type}, {self.parent_name})'
+
+
+class Stack(list):
+    def pop(self, __index: SupportsIndex = 0):
+        return super().pop(__index)
 
 
 class SymbolsVisitor(yaplVisitor):
@@ -77,10 +111,18 @@ class SymbolsVisitor(yaplVisitor):
             "Bool": 1,
         }
         self.t_count = 0
+        self.l_count = 0
+        self.var_stack = Stack()
+        self.temps = []
 
-    def get_t(self):
-        self.t_count += 1
+    def get_t(self, current=False):
+        if not current:
+            self.t_count += 1
         return f't{self.t_count}'
+
+    def get_l(self):
+        self.l_count += 1
+        return f'L{self.l_count}'
 
     def calc_size(self, ttype: str, name: str = '') -> int:
         size = 0
@@ -99,10 +141,7 @@ class SymbolsVisitor(yaplVisitor):
         if not value:
             value = "NONE"
         else:
-            if value.ID_VAR() or value.INT_VAR() or value.STR_VAR() or value.BOOL_VAR():
-                value = value.getText()
-            else:
-                value = value.getText()
+            value = value.getText()
         name = f'{ctx.ID_VAR().getText()} = {value}'
         ttype = ctx.getToken(44, 0).getText()
         size = self.calc_size(ttype)
@@ -119,6 +158,53 @@ class SymbolsVisitor(yaplVisitor):
             parent = parent.parentCtx
         if parent:
             sym.parent_name = parent.getToken(44, 0).getText()
+
+    def visitStatement_let(self, ctx: yaplParser.Statement_letContext):
+        """ parent = ctx.parentCtx.parentCtx.parentCtx
+        vars: List[yaplParser.VarTypescriptContext] = ctx.varTypescript()
+        for var in vars:
+            name = self.get_t()
+            ttype = var.getToken(44, 0).getText()
+            sym = Symbol(name, ttype)
+            self.var_stack.append(sym)
+            self.parent_scopes[id(parent)].refs.add_symbol(name, sym) """
+        parent = ctx.parentCtx.parentCtx.parentCtx
+        name = ctx.varTypescript(0).ID_VAR().getText()
+        refs = SymbolTable()
+        sym = Symbol(name, "LET", refs=refs)
+        self.parent_scopes[id(ctx)] = sym
+        self.parent_scopes[id(parent)].refs.add_symbol(name, sym)
+        return self.visitChildren(ctx)
+
+    def visitAsign_expr(self, ctx: yaplParser.Asign_exprContext):
+        self.visitChildren(ctx)
+        name = ctx.ID_VAR().getText()
+        ttype = str(type(ctx))
+        if len(self.temps) > 0:
+            sym = Symbol(name, ttype, ctx=self.temps.pop())
+        else:
+            sym = Symbol(name, ttype, ctx=ctx)
+        parent = ctx.parentCtx
+        while isinstance(parent, yaplParser.Statement_braceContext):
+            parent = parent.parentCtx
+        self.parent_scopes[id(parent)].refs.add_symbol(id(ctx), sym)
+        return
+
+    def visitNew_type(self, ctx: yaplParser.New_typeContext):
+        temp = self.get_t()
+        self.temps.append(temp)
+        sym = Symbol(temp, "OBJ", ctx=ctx)
+        parent = ctx.parentCtx.parentCtx.parentCtx
+        self.parent_scopes[id(parent)].refs.add_symbol(id(ctx), sym)
+        return self.visitChildren(ctx)
+
+    def visitStatement_if(self, ctx: yaplParser.Statement_ifContext):
+        parent = ctx.parentCtx
+        refs = SymbolTable()
+        sym = Symbol(str(id(ctx)), str(type(ctx)), ctx=ctx, refs=refs)
+        self.parent_scopes[id(ctx)] = sym
+        self.parent_scopes[id(parent)].refs.add_symbol(str(id(ctx)), sym)
+        return self.visitChildren(ctx)
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
         if ctx.getToken(2, 0):

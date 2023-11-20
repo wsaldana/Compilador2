@@ -1,4 +1,4 @@
-# Generated from compiler/grammar/yapl.g4 by ANTLR 4.13.0
+# Generated from yapl.g4 by ANTLR 4.13.0
 from antlr4 import *
 if "." in __name__:
     from .yaplParser import yaplParser
@@ -71,12 +71,210 @@ class yaplListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by yaplParser#expr.
-    def enterExpr(self, ctx:yaplParser.ExprContext):
+    # Enter a parse tree produced by yaplParser#new_type.
+    def enterNew_type(self, ctx:yaplParser.New_typeContext):
         pass
 
-    # Exit a parse tree produced by yaplParser#expr.
-    def exitExpr(self, ctx:yaplParser.ExprContext):
+    # Exit a parse tree produced by yaplParser#new_type.
+    def exitNew_type(self, ctx:yaplParser.New_typeContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#arith_mult.
+    def enterArith_mult(self, ctx:yaplParser.Arith_multContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#arith_mult.
+    def exitArith_mult(self, ctx:yaplParser.Arith_multContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#arith_sum.
+    def enterArith_sum(self, ctx:yaplParser.Arith_sumContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#arith_sum.
+    def exitArith_sum(self, ctx:yaplParser.Arith_sumContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_while.
+    def enterStatement_while(self, ctx:yaplParser.Statement_whileContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_while.
+    def exitStatement_while(self, ctx:yaplParser.Statement_whileContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_at.
+    def enterStatement_at(self, ctx:yaplParser.Statement_atContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_at.
+    def exitStatement_at(self, ctx:yaplParser.Statement_atContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#negative_expr.
+    def enterNegative_expr(self, ctx:yaplParser.Negative_exprContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#negative_expr.
+    def exitNegative_expr(self, ctx:yaplParser.Negative_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#arith_div.
+    def enterArith_div(self, ctx:yaplParser.Arith_divContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#arith_div.
+    def exitArith_div(self, ctx:yaplParser.Arith_divContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#int_var.
+    def enterInt_var(self, ctx:yaplParser.Int_varContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#int_var.
+    def exitInt_var(self, ctx:yaplParser.Int_varContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_paren.
+    def enterStatement_paren(self, ctx:yaplParser.Statement_parenContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_paren.
+    def exitStatement_paren(self, ctx:yaplParser.Statement_parenContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#bool_lt.
+    def enterBool_lt(self, ctx:yaplParser.Bool_ltContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#bool_lt.
+    def exitBool_lt(self, ctx:yaplParser.Bool_ltContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_let.
+    def enterStatement_let(self, ctx:yaplParser.Statement_letContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_let.
+    def exitStatement_let(self, ctx:yaplParser.Statement_letContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#void_expr.
+    def enterVoid_expr(self, ctx:yaplParser.Void_exprContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#void_expr.
+    def exitVoid_expr(self, ctx:yaplParser.Void_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#str_var.
+    def enterStr_var(self, ctx:yaplParser.Str_varContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#str_var.
+    def exitStr_var(self, ctx:yaplParser.Str_varContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#params.
+    def enterParams(self, ctx:yaplParser.ParamsContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#params.
+    def exitParams(self, ctx:yaplParser.ParamsContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_if.
+    def enterStatement_if(self, ctx:yaplParser.Statement_ifContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_if.
+    def exitStatement_if(self, ctx:yaplParser.Statement_ifContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#not_expr.
+    def enterNot_expr(self, ctx:yaplParser.Not_exprContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#not_expr.
+    def exitNot_expr(self, ctx:yaplParser.Not_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#equal.
+    def enterEqual(self, ctx:yaplParser.EqualContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#equal.
+    def exitEqual(self, ctx:yaplParser.EqualContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#bool_le.
+    def enterBool_le(self, ctx:yaplParser.Bool_leContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#bool_le.
+    def exitBool_le(self, ctx:yaplParser.Bool_leContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#arith_res.
+    def enterArith_res(self, ctx:yaplParser.Arith_resContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#arith_res.
+    def exitArith_res(self, ctx:yaplParser.Arith_resContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#asign_expr.
+    def enterAsign_expr(self, ctx:yaplParser.Asign_exprContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#asign_expr.
+    def exitAsign_expr(self, ctx:yaplParser.Asign_exprContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#id_var.
+    def enterId_var(self, ctx:yaplParser.Id_varContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#id_var.
+    def exitId_var(self, ctx:yaplParser.Id_varContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#bool_var.
+    def enterBool_var(self, ctx:yaplParser.Bool_varContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#bool_var.
+    def exitBool_var(self, ctx:yaplParser.Bool_varContext):
+        pass
+
+
+    # Enter a parse tree produced by yaplParser#statement_brace.
+    def enterStatement_brace(self, ctx:yaplParser.Statement_braceContext):
+        pass
+
+    # Exit a parse tree produced by yaplParser#statement_brace.
+    def exitStatement_brace(self, ctx:yaplParser.Statement_braceContext):
         pass
 
 
