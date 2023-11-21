@@ -14,8 +14,8 @@ class yaplVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by yaplParser#formal.
-    def visitFormal(self, ctx:yaplParser.FormalContext):
+    # Visit a parse tree produced by yaplParser#args.
+    def visitArgs(self, ctx:yaplParser.ArgsContext):
         return self.visitChildren(ctx)
 
 

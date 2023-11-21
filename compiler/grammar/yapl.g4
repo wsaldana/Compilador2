@@ -4,7 +4,7 @@ import lexers;
 
 program: (classDefinition SEMICOLON)+;
 
-formal: ID_VAR COLON TYPE_IDENTIFIER;
+formal: ID_VAR COLON TYPE_IDENTIFIER #args;
 
 varTypescript:
     <assoc = right> ID_VAR COLON TYPE_IDENTIFIER (ASSIGN expr)? # attributeDeclaration;

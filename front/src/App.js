@@ -9,6 +9,7 @@ function App() {
   const [symtab, setSymtab] = useState('');
   const [typing, setTyping] = useState('');
   const [tac, setTac] = useState('');
+  const [mips, setMips] = useState('');
   const [scriptCode, setScriptCode] = useState('');
 
   const runPythonScript = async () => {
@@ -29,6 +30,7 @@ function App() {
           setSymtab('')
           setTyping('')
           setTac('')
+          setMips('')
         } else {
           setErr(false)
           console.log(data)
@@ -36,6 +38,7 @@ function App() {
           setSymtab(data.symtab)
           setTyping(data.typing)
           setTac(data.tac)
+          setMips(data.mips)
         }
       } else {
         console.error('Error running the Python script.');
@@ -90,6 +93,12 @@ function App() {
             <div className="gjs-cell" id="iqlk">
               <div id="i4fwu1" style={typing ? {color: 'red'} : {color: 'lime'}}>
                 {tac ? tac : "TAC:"}<br />
+              </div>
+            </div>
+            <br></br>
+            <div className="gjs-cell" id="iqlk">
+              <div id="i4fwu1" style={typing ? {color: 'red'} : {color: 'lime'}}>
+                {mips ? mips : "MIPS:"}<br />
               </div>
             </div>
           </div>

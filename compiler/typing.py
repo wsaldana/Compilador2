@@ -13,7 +13,7 @@ class TypingVisitor(yaplVisitor):
 
     def visitAttr(self, ctx: yaplParser.AttrContext):
         pos = ctx.getSourceInterval()
-        for child in ctx.children:
+        """ for child in ctx.children:
             if isinstance(child, yaplParser.ExprContext):
                 if len(child.getTokens(45)) > 0:
                     err = ErrorListener()
@@ -34,7 +34,7 @@ class TypingVisitor(yaplVisitor):
                         pos[1],
                         "Unable to assign Bool to Int variable",
                         None
-                    )
+                    ) """
 
     def visitExpr(self, ctx: yaplParser.ExprContext):
         if ctx.getToken(2, 0):

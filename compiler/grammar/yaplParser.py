@@ -254,32 +254,42 @@ class yaplParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def ID_VAR(self):
-            return self.getToken(yaplParser.ID_VAR, 0)
-
-        def COLON(self):
-            return self.getToken(yaplParser.COLON, 0)
-
-        def TYPE_IDENTIFIER(self):
-            return self.getToken(yaplParser.TYPE_IDENTIFIER, 0)
 
         def getRuleIndex(self):
             return yaplParser.RULE_formal
 
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+
+    class ArgsContext(FormalContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a yaplParser.FormalContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def ID_VAR(self):
+            return self.getToken(yaplParser.ID_VAR, 0)
+        def COLON(self):
+            return self.getToken(yaplParser.COLON, 0)
+        def TYPE_IDENTIFIER(self):
+            return self.getToken(yaplParser.TYPE_IDENTIFIER, 0)
+
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFormal" ):
-                listener.enterFormal(self)
+            if hasattr( listener, "enterArgs" ):
+                listener.enterArgs(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFormal" ):
-                listener.exitFormal(self)
+            if hasattr( listener, "exitArgs" ):
+                listener.exitArgs(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitFormal" ):
-                return visitor.visitFormal(self)
+            if hasattr( visitor, "visitArgs" ):
+                return visitor.visitArgs(self)
             else:
                 return visitor.visitChildren(self)
-
 
 
 
@@ -288,6 +298,7 @@ class yaplParser ( Parser ):
         localctx = yaplParser.FormalContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_formal)
         try:
+            localctx = yaplParser.ArgsContext(self, localctx)
             self.enterOuterAlt(localctx, 1)
             self.state = 23
             self.match(yaplParser.ID_VAR)

@@ -17,12 +17,12 @@ class yaplListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by yaplParser#formal.
-    def enterFormal(self, ctx:yaplParser.FormalContext):
+    # Enter a parse tree produced by yaplParser#args.
+    def enterArgs(self, ctx:yaplParser.ArgsContext):
         pass
 
-    # Exit a parse tree produced by yaplParser#formal.
-    def exitFormal(self, ctx:yaplParser.FormalContext):
+    # Exit a parse tree produced by yaplParser#args.
+    def exitArgs(self, ctx:yaplParser.ArgsContext):
         pass
 
 
