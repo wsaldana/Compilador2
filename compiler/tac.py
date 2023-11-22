@@ -70,6 +70,9 @@ class SymbolsVisitor(yaplVisitor):
         else:
             priv_stack = self.var_stack
 
+        if len(args):
+            print(f"PARAMS {ctx.ID_VAR()}")
+
         for arg in args:
             self.visit(arg)
             print(f"PUSH {priv_stack.pop()}")
